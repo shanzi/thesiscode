@@ -138,10 +138,14 @@ def readtopics(path):
 
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", help="The file which contains the topics to be processed")
     args = parser.parse_args()
     if args.filename.strip():
+        if not os.path.isdir(OUTPUTDIR):
+            logging.debug('making output directory: %s' % OUTPUTDIR)
+            os.mkdir(OUTPUTDIR)
         topics = readtopics(args.filename.strip())
         logging.info('%d topics to process' % len(topics))
         for tname, tid in topics:
