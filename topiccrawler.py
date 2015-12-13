@@ -88,7 +88,7 @@ class Topic(object):
         items = PyQuery(url)('.feed-item')
         return [self.get_question(PyQuery(item)) for item in items]
 
-    def persist(self, count=200):
+    def persist(self, count=400):
         if self.finished:
             logging.info("skipped %s" % self)
             return
@@ -106,7 +106,7 @@ class Topic(object):
             finally:
                 page += 1
 
-                wait = random.randint(5, 30)
+                wait = random.randint(5, 20)
                 logging.debug('wait for %d seconds' % wait)
                 time.sleep(wait)
 
