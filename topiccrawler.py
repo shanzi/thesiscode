@@ -65,7 +65,7 @@ class Topic(object):
     def get_question(self, item):
         subtopicdom = item.children('.subtopic a')
         subtopic = subtopicdom.text().strip()
-        subtopicid = int(subtopicdom.attr('href').split('/')[2])
+        subtopicid = int(subtopicdom.attr('href').split('/')[2]) if subtopicdom.attr('href') else self.id
         titledom = item.children('.question-item-title a')
         title = titledom.text().strip()
         questionid = int(titledom.attr('href').split('/')[2])
@@ -99,7 +99,6 @@ class Topic(object):
         while len(questions) < count and page < 100:
             try:
                 questions.extend(self.get_questions(page))
-                wait = random.randint(5, 60)
             except Exception, e:
                 logging.error("failed to fetch and parse %s(page %d)" % (self, page))
                 logging.exception(e)
@@ -107,6 +106,7 @@ class Topic(object):
             finally:
                 page += 1
 
+                wait = random.randint(5, 30)
                 logging.debug('wait for %d seconds' % wait)
                 time.sleep(wait)
 
