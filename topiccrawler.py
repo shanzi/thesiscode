@@ -7,6 +7,7 @@ import json
 import random
 import urllib
 import logging
+import argparse
 import coloredlogs
 
 from pyquery import PyQuery
@@ -14,7 +15,7 @@ from pyquery import PyQuery
 BASEDIR = os.path.dirname(os.path.abspath(__name__))
 OUTPUTDIR = os.path.join(BASEDIR, 'output')
 
-coloredlogs.install(level='DEBUG')
+coloredlogs.install()
 
 
 class Topic(object):
@@ -81,7 +82,7 @@ class Topic(object):
         }
 
     def get_questions(self, page):
-        logging.info('handling: %s (page %d)' % (self, page))
+        logging.info('processing: %s (page %d)' % (self, page))
         url = self.url_for_page(page)
         logging.debug('fetching: %s' % url)
         items = PyQuery(url)('.feed-item')
@@ -98,7 +99,7 @@ class Topic(object):
         while len(questions) < count and page < 100:
             try:
                 questions.extend(self.get_questions(page))
-                wait = random.randint(10, 60)
+                wait = random.randint(5, 60)
             except Exception, e:
                 logging.error("failed to fetch and parse %s(page %d)" % (self, page))
                 logging.exception(e)
@@ -125,6 +126,24 @@ class Topic(object):
             json.dump(obj, f)
 
 
+def readtopics(path):
+    topics = []
+    with open(path) as f:
+        for l in f.readlines():
+            l = l.decode('utf8').strip()
+            if not l: continue
+            topicpair = l.split()
+            topics.append((topicpair[0], int(topicpair[1])))
+    return topics
+
+
 if __name__ == "__main__":
-    t = Topic('art', 19550434)
-    t.persist()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename", help="The file which contains the topics to be processed")
+    args = parser.parse_args()
+    if args.filename.strip():
+        topics = readtopics(args.filename.strip())
+        logging.info('%d topics to process' % len(topics))
+        for tname, tid in topics:
+            topic = Topic(tname, tid)
+            topic.persist()
