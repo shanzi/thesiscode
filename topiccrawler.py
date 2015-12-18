@@ -13,7 +13,7 @@ import coloredlogs
 from pyquery import PyQuery
 
 BASEDIR = os.path.dirname(os.path.abspath(__name__))
-OUTPUTDIR = os.path.join(BASEDIR, 'output')
+OUTPUTDIR = os.path.join(BASEDIR, 'data/output')
 
 coloredlogs.install()
 
