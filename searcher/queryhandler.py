@@ -9,11 +9,10 @@ import argparse
 import cPickle as pickle
 from collections import Counter
 
+__all__ = ('BoolQueryHandler', 'ConceptualGraphQueryHandler')
 
-class BoolQueryHandler(object):
 
-    """This class handles queries by bool model"""
-
+class QueryHandlerBase(object):
     def __init__(self, path):
         self._path = path
         self.loadindex()
@@ -21,6 +20,14 @@ class BoolQueryHandler(object):
     def loadindex(self):
         with bz2.BZ2File(self._path) as f:
             self._index = pickle.load(f)
+
+    def query(self, kw):
+        raise NotImplementedError()
+
+
+class BoolQueryHandler(QueryHandlerBase):
+
+    """This class handles queries by bool model"""
 
     def getquestion(self, qres):
         qid, score = qres
@@ -35,12 +42,7 @@ class BoolQueryHandler(object):
         return map(self.getquestion, counter.most_common(20))
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('path', help="Path to index file")
-    args = parser.parse_args()
-    if args.path:
-        queryHandler = BoolQueryHandler(args.path)
-        while True:
-            keywords = filter(None, raw_input('> ').decode('utf8').split())
-            print queryHandler.query(keywords)
+class ConceptualGraphQueryHandler(QueryHandlerBase):
+
+    def query(self, graph):
+        pass
